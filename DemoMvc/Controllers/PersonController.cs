@@ -7,12 +7,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DemoMvc.Data;
 using DemoMvc.Models;
+using DemoMVC.Models.Process;
+using System.Data;
 
 namespace DemoMvc.Controllers
 {
     public class PersonController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ExcelProcess _excelProcess = new ExcelProcess();
 
         public PersonController(ApplicationDbContext context)
         {
@@ -153,5 +156,56 @@ namespace DemoMvc.Controllers
         {
             return _context.Person.Any(e => e.PersonId == id);
         }
+        public async Task<IActionResult> Upload ()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Upload(IFormFile file)
+        {
+            if (file !=null)
+            {
+                string fileExtension = Path.GetExtension(file.FileName);
+                if( fileExtension != ".xls"&& fileExtension != ".xlsx")
+                {
+                    ModelState.AddModelError("","Please choose excel file to upload!");
+
+                }
+                else
+                {
+                    //rename file to upload to server
+                    var fileName = DateTime.Now.ToShortTimeString() + fileExtension;
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory() + "/Uloads/Excels", fileName);
+                    var fileLocation = new FileInfo(filePath).ToString();
+                    using (var stream =  new FileStream(filePath, FileMode.Create))
+                    {
+                        //save file to server
+                        await file.CopyToAsync(stream);
+                        //read data from excel file fill datatable
+                        var dt = _excelProcess.ExcelToDataTable(fileLocation);
+                        //using for loop to read data from dt
+                        for ( int i=0; i< dt.Rows.Count; i++)
+                        {
+                            //Create new person object
+                            var ps = new Person();
+                            //set value to attributes
+                            ps.PersonId = dt.Rows[i][0].ToString();
+                            ps.FullName = dt.Rows[i][1].ToString();
+                            ps.Address =  dt.Rows[i][2].ToString();
+                            ps.Email =  dt.Rows[i][3].ToString();
+                            //add object to context
+                            _context.Add(ps);
+
+                        }
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
+            return View();
+        }
+
     }
 }
+

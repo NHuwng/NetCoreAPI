@@ -4,7 +4,7 @@ namespace DemoMvc.Models
 {
     public class Employee : Person
     {
-        [Key]
+        
         public string? EmployeeId { get; set; }
         public int  Age {get; set;}
     }
