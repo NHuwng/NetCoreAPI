@@ -379,3 +379,6 @@ D:\PTPMQL\DemoMvc\bin\Debug\net9.0\System.Private.Windows.Core.dll
 D:\PTPMQL\DemoMvc\bin\Debug\net9.0\System.Security.Cryptography.Pkcs.dll
 D:\PTPMQL\DemoMvc\bin\Debug\net9.0\runtimes\win\lib\net9.0\Microsoft.Win32.SystemEvents.dll
 D:\PTPMQL\DemoMvc\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Security.Cryptography.Pkcs.dll
+D:\PTPMQL\DemoMvc\bin\Debug\net9.0\X.PagedList.dll
+D:\PTPMQL\DemoMvc\bin\Debug\net9.0\X.PagedList.Mvc.Core.dll
+D:\PTPMQL\DemoMvc\obj\Debug\net9.0\DemoMvc.MvcApplicationPartsAssemblyInfo.cs

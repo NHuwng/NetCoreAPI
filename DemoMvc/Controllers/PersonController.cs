@@ -9,6 +9,8 @@ using DemoMvc.Data;
 using DemoMvc.Models;
 using DemoMVC.Models.Process;
 using System.Data;
+using OfficeOpenXml;
+
 
 namespace DemoMvc.Controllers
 {
@@ -21,7 +23,7 @@ namespace DemoMvc.Controllers
         {
             _context = context;
         }
-
+        
         // GET: Person
         public async Task<IActionResult> Index()
         {
@@ -176,7 +178,7 @@ namespace DemoMvc.Controllers
                 {
                     //rename file to upload to server
                     var fileName = DateTime.Now.ToShortTimeString() + fileExtension;
-                    var filePath = Path.Combine(Directory.GetCurrentDirectory() + "/Uloads/Excels", fileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory() + "/Uploads/Excels", fileName);
                     var fileLocation = new FileInfo(filePath).ToString();
                     using (var stream =  new FileStream(filePath, FileMode.Create))
                     {
@@ -205,6 +207,30 @@ namespace DemoMvc.Controllers
             }
             return View();
         }
+        public IActionResult Download ()
+        {
+            //name the file when downloading
+            var fileName = "yourFileName" + ".xlsx";
+            using (ExcelPackage excelPackage = new ExcelPackage())
+            {
+                ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add("Sheet 1");
+                //add some text to cell A1
+                worksheet.Cells["A1"].Value = "PersonId";
+                worksheet.Cells["B1"].Value = "FullName";
+                worksheet.Cells["C1"].Value = "Address";
+                worksheet.Cells["D1"].Value = "Email";
+                //Get all persion
+                var personList = _context.Person.ToList();
+                //fill data to worksheet
+                worksheet.Cells["A2"].LoadFromCollection(personList);
+                var stream = new MemoryStream(excelPackage.GetAsByteArray());
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+
+            }
+        }
+        //()
+        
+
 
     }
 }
